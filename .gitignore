@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.qm
+dist/
+*.zip
+.idea/
+.vscode/
+.pytest_cache/
