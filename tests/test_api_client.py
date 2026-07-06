@@ -45,6 +45,19 @@ def test_normalize_server_url():
     assert ac.normalize_server_url('') == ''
 
 
+@pytest.mark.parametrize('url', ['file:///etc/passwd', 'ftp://x/y', 'data:text/plain,x', '//no-scheme'])
+def test_non_http_schemes_rejected(url):
+    with pytest.raises(ac.TransportFailure):
+        ac.ensure_http_scheme(url)
+    with pytest.raises(ac.TransportFailure):
+        ac.UrllibTransport().send('GET', url, {}, None)
+
+
+def test_http_schemes_accepted():
+    ac.ensure_http_scheme('https://example.com/api')
+    ac.ensure_http_scheme('http://127.0.0.1:5000/api')
+
+
 def test_create_session():
     c, t, _ = client([jr(201, {'upload_id': 'Ab12Cd34', 'expires_in_seconds': 259200})])
     assert c.create_session()['upload_id'] == 'Ab12Cd34'

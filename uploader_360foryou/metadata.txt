@@ -12,10 +12,13 @@ about=Uploads data from the current QGIS project to 360-for-you.com or a self-ho
     Requires an account and an API key (Profile - API keys, scopes projects:read and
     projects:write). The server URL is configurable for self-hosted installations.
     Uses only the QGIS/Python standard library - no external dependencies.
-version=0.1.0
+version=0.1.1
 author=360-for-you.com
 email=support@360-for-you.com
-changelog=0.1.0
+changelog=0.1.1
+    - Restrict the stdlib HTTP transport to http/https URL schemes
+      (plugins.qgis.org security scan finding)
+    0.1.0
     - Initial release: rasters (GeoTIFF), vectors (KML), point clouds (LAS/LAZ),
       files from disk; resumable chunked uploads; project creation and status polling
 tags=cloud,upload,web,sharing,pointcloud,las,laz,kml,geotiff,raster,vector,360,panorama,api

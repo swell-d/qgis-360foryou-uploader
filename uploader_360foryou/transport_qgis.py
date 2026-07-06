@@ -12,7 +12,7 @@ from qgis.core import QgsBlockingNetworkRequest
 from qgis.PyQt.QtCore import QByteArray, QUrl
 from qgis.PyQt.QtNetwork import QNetworkRequest
 
-from .api_client import Response, TransportFailure, UploadCanceled
+from .api_client import Response, TransportFailure, UploadCanceled, ensure_http_scheme
 
 
 def feedback_sleep(feedback):
@@ -37,6 +37,7 @@ class QgisBlockingTransport:
         # TransportFailure — otherwise the retry loop keeps re-sending it.
         if self.feedback is not None and self.feedback.isCanceled():
             raise UploadCanceled()
+        ensure_http_scheme(url)  # Qt would happily open file:// and friends
         request = QNetworkRequest(QUrl(url))
         for name, value in (headers or {}).items():
             request.setRawHeader(name.encode('utf-8'), str(value).encode('utf-8'))

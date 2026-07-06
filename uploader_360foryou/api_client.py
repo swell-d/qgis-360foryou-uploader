@@ -66,17 +66,42 @@ class TransportFailure(Exception):
     """Network-level failure (no HTTP response) — retryable."""
 
 
+def ensure_http_scheme(url):
+    """Reject anything but http/https before it reaches a network stack
+    (urlopen and Qt would otherwise also accept file:// and other schemes)."""
+    scheme = urllib.parse.urlsplit(url).scheme.lower()
+    if scheme not in ('http', 'https'):
+        raise TransportFailure('unsupported URL scheme: %s' % (scheme or '(none)'))
+
+
+def _build_http_opener():
+    # Explicit handler list instead of urlopen/build_opener: no FileHandler,
+    # FTPHandler or DataHandler, so non-HTTP schemes cannot be opened at all.
+    opener = urllib.request.OpenerDirector()
+    for handler in (urllib.request.ProxyHandler(),  # honors HTTP(S)_PROXY env vars
+                    urllib.request.UnknownHandler(),
+                    urllib.request.HTTPHandler(),
+                    urllib.request.HTTPSHandler(),
+                    urllib.request.HTTPDefaultErrorHandler(),
+                    urllib.request.HTTPRedirectHandler(),
+                    urllib.request.HTTPErrorProcessor()):
+        opener.add_handler(handler)
+    return opener
+
+
 class UrllibTransport:
     """Stdlib transport. Note: ignores QGIS proxy settings (only HTTP(S)_PROXY
     env vars) and rejects certificates that QGIS itself might trust."""
 
     def __init__(self, timeout=DEFAULT_TIMEOUT):
         self.timeout = timeout
+        self._opener = _build_http_opener()
 
     def send(self, method, url, headers, body):
+        ensure_http_scheme(url)
         request = urllib.request.Request(url, data=body, method=method, headers=dict(headers or {}))
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as r:
+            with self._opener.open(request, timeout=self.timeout) as r:
                 return Response(r.status, dict(r.headers), r.read())
         except urllib.error.HTTPError as e:
             return Response(e.code, dict(e.headers or {}), e.read())

@@ -137,8 +137,9 @@ class UploadTask(QgsTask):
                 self.client._sleep = lambda seconds: None
                 self.client.max_retries = 0
                 self.client.delete_session(self.upload_id)
-            except Exception:
-                pass
+            except Exception as e:  # best-effort; the server GCs the session in 72 h anyway
+                QgsMessageLog.logMessage('Upload session cleanup failed: %s' % e,
+                                         LOG_TAG, Qgis.MessageLevel.Warning)
 
     # -------------------------------------------------------------- main thread
 
