@@ -2,7 +2,6 @@
 name=360ForYou Uploader
 qgisMinimumVersion=3.40
 qgisMaximumVersion=4.99
-supportsQt6=True
 description=Upload raster, vector and point cloud layers from QGIS to a 360-for-you.com project
 about=Uploads data from the current QGIS project to 360-for-you.com or a self-hosted
     360ForYou server and creates a viewer project you can share by link.
