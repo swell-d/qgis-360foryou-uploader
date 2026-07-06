@@ -30,6 +30,8 @@ notification offers to open the new project in the browser.
 1. Click the 360ForYou toolbar button (or *Plugins → 360ForYou Uploader*).
 2. Enter the server URL (self-hosted installations only — the default is
    360-for-you.com) and your API key; *Test connection* verifies both.
+   The server URL must be https — plain http is accepted only for
+   localhost development servers.
 3. Check the layers to upload, optionally add files from disk.
 4. Set the project title and privacy, press **Upload**.
 

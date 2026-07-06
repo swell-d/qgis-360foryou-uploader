@@ -16,7 +16,8 @@ version=0.1.1
 author=360-for-you.com
 email=support@360-for-you.com
 changelog=0.1.1
-    - Restrict the stdlib HTTP transport to http/https URL schemes
+    - Require https for the server URL (plain http is allowed only for
+      localhost development servers); reject non-HTTP URL schemes entirely
       (plugins.qgis.org security scan finding)
     0.1.0
     - Initial release: rasters (GeoTIFF), vectors (KML), point clouds (LAS/LAZ),

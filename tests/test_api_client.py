@@ -45,17 +45,25 @@ def test_normalize_server_url():
     assert ac.normalize_server_url('') == ''
 
 
-@pytest.mark.parametrize('url', ['file:///etc/passwd', 'ftp://x/y', 'data:text/plain,x', '//no-scheme'])
-def test_non_http_schemes_rejected(url):
+@pytest.mark.parametrize('url', [
+    'file:///etc/passwd', 'ftp://x/y', 'data:text/plain,x', '//no-scheme',
+    'http://example.com/api',  # plain http to a remote host — data is sensitive
+    'http://192.168.1.10/api',
+])
+def test_insecure_urls_rejected(url):
     with pytest.raises(ac.TransportFailure):
-        ac.ensure_http_scheme(url)
+        ac.ensure_secure_scheme(url)
     with pytest.raises(ac.TransportFailure):
         ac.UrllibTransport().send('GET', url, {}, None)
 
 
-def test_http_schemes_accepted():
-    ac.ensure_http_scheme('https://example.com/api')
-    ac.ensure_http_scheme('http://127.0.0.1:5000/api')
+@pytest.mark.parametrize('url', [
+    'https://example.com/api',
+    'http://127.0.0.1:5000/api',  # loopback: local dev servers
+    'http://localhost:5000/api',
+])
+def test_secure_urls_accepted(url):
+    ac.ensure_secure_scheme(url)
 
 
 def test_create_session():

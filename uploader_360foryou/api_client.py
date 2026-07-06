@@ -66,12 +66,21 @@ class TransportFailure(Exception):
     """Network-level failure (no HTTP response) — retryable."""
 
 
-def ensure_http_scheme(url):
-    """Reject anything but http/https before it reaches a network stack
-    (urlopen and Qt would otherwise also accept file:// and other schemes)."""
-    scheme = urllib.parse.urlsplit(url).scheme.lower()
-    if scheme not in ('http', 'https'):
-        raise TransportFailure('unsupported URL scheme: %s' % (scheme or '(none)'))
+def ensure_secure_scheme(url):
+    """Require https before the URL reaches a network stack; plain http is
+    allowed only for loopback hosts (local development servers), where traffic
+    never leaves the machine. Also rejects file:// and other non-HTTP schemes
+    that urlopen and Qt would otherwise accept."""
+    parts = urllib.parse.urlsplit(url)
+    scheme = parts.scheme.lower()
+    if scheme == 'https':
+        return
+    host = (parts.hostname or '').lower()
+    if scheme == 'http' and (host == 'localhost' or host == '::1' or host.startswith('127.')):
+        return
+    if scheme == 'http':
+        raise TransportFailure('https is required for %s (http is allowed only for localhost)' % host)
+    raise TransportFailure('unsupported URL scheme: %s' % (scheme or '(none)'))
 
 
 def _build_http_opener():
@@ -98,7 +107,7 @@ class UrllibTransport:
         self._opener = _build_http_opener()
 
     def send(self, method, url, headers, body):
-        ensure_http_scheme(url)
+        ensure_secure_scheme(url)
         request = urllib.request.Request(url, data=body, method=method, headers=dict(headers or {}))
         try:
             with self._opener.open(request, timeout=self.timeout) as r:
