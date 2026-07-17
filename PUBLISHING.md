@@ -50,10 +50,12 @@ project to the production server with a real API key.
    They check that the metadata links work, the repo is public, and the plugin
    installs and starts without crashing. Answer reviewer feedback in the
    plugin's page/ticket — unanswered remarks stall the approval.
-4. `experimental=True` (current setting) keeps expectations low for 0.x
-   releases; users only see it after enabling *Show also experimental plugins*
-   in the plugin manager settings. For the stable release: set
-   `experimental=False`, bump to 1.0.0.
+4. `experimental=True` keeps expectations low for 0.x releases; users only see
+   the plugin after enabling *Show also experimental plugins* in the plugin
+   manager settings. The flag is read from the metadata of each uploaded
+   version, so promoting to stable is just `experimental=False` plus a version
+   bump in a new upload (done in 1.0.0). Note that users who installed an
+   experimental version keep getting updates only while that setting stays on.
 
 ## 4. Releasing an update
 

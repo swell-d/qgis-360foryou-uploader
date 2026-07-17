@@ -11,7 +11,7 @@ future public source repository (a public repo is required by plugins.qgis.org
 ```
 uploader_360foryou/     the plugin package (this is what gets zipped)
   __init__.py           classFactory
-  plugin.py             toolbar/menu action, translator, task/poller registry
+  plugin.py             toolbar/menu action, task/poller registry
   main_dialog.py        upload dialog, completion messages, status poller
   upload_task.py        QgsTask: export -> chunked upload -> create project
   exporters.py          layer assessment + export jobs (raster/vector/point cloud)
@@ -20,7 +20,6 @@ uploader_360foryou/     the plugin package (this is what gets zipped)
   naming.py             ASCII-safe remote filenames
   plugin_settings.py    QgsSettings persistence
   metadata.txt          plugin metadata (version lives here)
-  i18n/                 Qt translations (.ts sources, .qm compiled at build)
 scripts/package.py      builds dist/uploader_360foryou.<version>.zip
 tests/                  pytest suite for the pure-Python modules (no QGIS needed)
 PUBLISHING.md           how to publish/update on plugins.qgis.org
@@ -72,14 +71,10 @@ Produces `dist/uploader_360foryou.<version>.zip` (version from
 `uploader_360foryou/metadata.txt`). Sanity-check the zip via
 *Plugins → Manage and Install Plugins → Install from ZIP*.
 
-## Translations
+## Language
 
-Wrap user-visible strings in `self.tr(...)` (or
-`QCoreApplication.translate('UploadDialog', ...)` at module level). Update the
-catalog and translate:
-
-```
-pylupdate5 uploader_360foryou/*.py -ts uploader_360foryou/i18n/uploader_360foryou_ru.ts
-```
-
-`scripts/package.py` compiles `.ts` → `.qm` when `lrelease` is on PATH.
+The plugin ships English-only and no translation catalog is maintained. Keep
+user-visible strings in English; the `self.tr(...)` /
+`QCoreApplication.translate('UploadDialog', ...)` wrappers around them are Qt
+boilerplate that returns the source string unchanged, kept only so a catalog
+could be added later without touching every call site.

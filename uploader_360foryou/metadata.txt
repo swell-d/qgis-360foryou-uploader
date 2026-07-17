@@ -12,10 +12,12 @@ about=Uploads data from the current QGIS project to 360-for-you.com or a self-ho
     Requires an account and an API key (Profile - API keys, scopes projects:read and
     projects:write). The server URL is configurable for self-hosted installations.
     Uses only the QGIS/Python standard library - no external dependencies.
-version=0.1.2
+version=1.0.0
 author=360-for-you.com
 email=support@360-for-you.com
-changelog=0.1.2
+changelog=1.0.0
+    - First stable release; no longer marked experimental
+    0.1.2
     - Point the homepage link to the dedicated plugin page with usage
       instructions (store review feedback); no functional changes
     0.1.1
@@ -30,7 +32,7 @@ homepage=https://360-for-you.com/qgis-plugin
 tracker=https://github.com/swell-d/qgis-360foryou-uploader/issues
 repository=https://github.com/swell-d/qgis-360foryou-uploader
 icon=icon.png
-experimental=True
+experimental=False
 deprecated=False
 hasProcessingProvider=no
 server=False

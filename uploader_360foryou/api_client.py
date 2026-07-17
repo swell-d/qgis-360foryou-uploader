@@ -360,8 +360,7 @@ def _int_or_none(value):
 
 
 def user_message_for(exc, server_url=''):
-    """Human-readable English message for a client exception. The UI layer
-    passes these through Qt translation at display time."""
+    """Human-readable English message for a client exception."""
     server = normalize_server_url(server_url) or 'the server'
     if isinstance(exc, AuthError):
         return ('Invalid or missing API key. Create one at %s/profile#api-keys '

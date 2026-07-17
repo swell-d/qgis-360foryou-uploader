@@ -5,12 +5,9 @@ Usage:  python scripts/package.py
 Output: dist/uploader_360foryou.<version>.zip  (version read from metadata.txt)
 
 The zip contains the package folder at its root, as plugins.qgis.org expects.
-Excluded: __pycache__, *.pyc, *.ts translation sources, hidden files.
-Translations (*.ts) are compiled to *.qm first when lrelease is on PATH.
+Excluded: __pycache__, *.pyc, hidden files.
 """
 import configparser
-import shutil
-import subprocess
 import sys
 import zipfile
 from pathlib import Path
@@ -18,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PACKAGE = 'uploader_360foryou'
 MAX_SIZE = 20 * 1024 * 1024  # plugins.qgis.org package size limit
-EXCLUDED_SUFFIXES = {'.pyc', '.ts'}
+EXCLUDED_SUFFIXES = {'.pyc'}
 EXCLUDED_NAMES = {'__pycache__'}
 
 
@@ -26,20 +23,6 @@ def read_version():
     parser = configparser.ConfigParser()
     parser.read(ROOT / PACKAGE / 'metadata.txt', encoding='utf-8')
     return parser['general']['version']
-
-
-def compile_translations():
-    ts_files = sorted((ROOT / PACKAGE / 'i18n').glob('*.ts'))
-    if not ts_files:
-        return
-    lrelease = (shutil.which('lrelease') or shutil.which('lrelease-qt5')
-                or shutil.which('lrelease-qt6'))
-    if not lrelease:
-        print('warning: lrelease not found - .qm translations were not compiled')
-        return
-    for ts in ts_files:
-        subprocess.run([lrelease, str(ts), '-qm', str(ts.with_suffix('.qm'))], check=True)
-        print('compiled', ts.with_suffix('.qm').name)
 
 
 def included(rel: Path) -> bool:
@@ -50,7 +33,6 @@ def included(rel: Path) -> bool:
 
 def main():
     version = read_version()
-    compile_translations()
     dist = ROOT / 'dist'
     dist.mkdir(exist_ok=True)
     out = dist / ('%s.%s.zip' % (PACKAGE, version))

@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Plugin entry object: toolbar button, menu entry, translator, and the
-registry that keeps background tasks / pollers alive between dialogs."""
+"""Plugin entry object: toolbar button, menu entry, and the registry that
+keeps background tasks / pollers alive between dialogs."""
 import os
 
-from qgis.core import QgsSettings
-from qgis.PyQt.QtCore import QCoreApplication, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication
 
 try:  # QAction lives in QtGui on Qt6; the qgis.PyQt shim provides it there on Qt5 too
     from qgis.PyQt.QtGui import QAction, QIcon
@@ -21,10 +20,8 @@ class UploaderPlugin:
     def __init__(self, iface):
         self.iface = iface
         self.action = None
-        self.translator = None
         self._tasks = []    # Python refs — QgsTask wrappers must not be GC'd mid-run
         self._pollers = []
-        self._install_translator()
 
     # -- registry protocol used by main_dialog ------------------------------
 
@@ -57,9 +54,6 @@ class UploaderPlugin:
             self.iface.removePluginMenu(MENU_TITLE, self.action)
             self.iface.removeToolBarIcon(self.action)
             self.action = None
-        if self.translator is not None:
-            QCoreApplication.removeTranslator(self.translator)
-            self.translator = None
 
     def run(self):
         from .main_dialog import UploadDialog
@@ -67,17 +61,6 @@ class UploaderPlugin:
         dialog.exec()
 
     # ------------------------------------------------------------------------
-
-    def _install_translator(self):
-        locale = str(QgsSettings().value('locale/userLocale', '') or '')[:2]
-        if not locale:
-            return
-        path = os.path.join(PLUGIN_DIR, 'i18n', 'uploader_360foryou_%s.qm' % locale)
-        if os.path.exists(path):
-            translator = QTranslator()
-            if translator.load(path):
-                QCoreApplication.installTranslator(translator)
-                self.translator = translator
 
     def tr(self, message):
         return QCoreApplication.translate('UploaderPlugin', message)
